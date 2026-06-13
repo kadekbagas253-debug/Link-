@@ -1,0 +1,1215 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaxy Infinity: Game Asteroid</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #0a0a2a;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(10, 20, 50, 0.85);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(64, 156, 255, 0.3);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            color: #4fc3f7;
+            font-size: 2.5rem;
+        }
+        
+        .logo h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(90deg, #4fc3f7, #9c27b0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(79, 195, 247, 0.3);
+        }
+        
+        .game-stats {
+            display: flex;
+            gap: 25px;
+        }
+        
+        .stat-box {
+            background: rgba(20, 30, 70, 0.8);
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 120px;
+            border: 1px solid rgba(64, 156, 255, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4fc3f7;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #a0c8ff;
+        }
+        
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        /* Dashboard */
+        .dashboard {
+            flex: 3;
+            background: rgba(10, 20, 50, 0.85);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(64, 156, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .dashboard h2 {
+            color: #4fc3f7;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(64, 156, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .dashboard h2 i {
+            font-size: 1.5rem;
+        }
+        
+        .game-area {
+            flex: 1;
+            background: rgba(5, 10, 30, 0.9);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid rgba(64, 156, 255, 0.2);
+        }
+        
+        #game-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        /* Base */
+        .base {
+            flex: 2;
+            background: rgba(10, 20, 50, 0.85);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(64, 156, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .base h2 {
+            color: #9c27b0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(156, 39, 176, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .base h2 i {
+            font-size: 1.5rem;
+        }
+        
+        .planet-info {
+            background: rgba(20, 30, 70, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(64, 156, 255, 0.2);
+        }
+        
+        .planet-info h3 {
+            color: #ff9800;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .planet-info p {
+            color: #c5cae9;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+        
+        .planet-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .planet-item {
+            background: rgba(20, 30, 70, 0.8);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        
+        .planet-item:hover {
+            transform: translateY(-5px);
+            border-color: rgba(79, 195, 247, 0.5);
+            box-shadow: 0 5px 15px rgba(79, 195, 247, 0.2);
+        }
+        
+        .planet-item.active {
+            border-color: #4fc3f7;
+            background: rgba(30, 50, 100, 0.9);
+        }
+        
+        .planet-icon {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .planet-name {
+            font-weight: bold;
+            color: #4fc3f7;
+            font-size: 0.9rem;
+        }
+        
+        /* Knowledge Section */
+        .knowledge-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .question-box, .info-box {
+            background: rgba(10, 20, 50, 0.85);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(64, 156, 255, 0.3);
+        }
+        
+        .question-box h3, .info-box h3 {
+            color: #4caf50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .question-box h3 i, .info-box h3 i {
+            font-size: 1.3rem;
+        }
+        
+        .question-text, .info-text {
+            color: #c5cae9;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            min-height: 60px;
+        }
+        
+        .answer-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, #2196f3, #0d47a1);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(90deg, #9c27b0, #6a1b9a);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(90deg, #4caf50, #2e7d32);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(90deg, #ff9800, #ef6c00);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(90deg, #f44336, #c62828);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .answer-btn {
+            flex: 1;
+            min-width: 120px;
+            background: rgba(30, 50, 100, 0.9);
+            color: #c5cae9;
+            border: 1px solid rgba(64, 156, 255, 0.3);
+        }
+        
+        .answer-btn.correct {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: #4caf50;
+            color: #a5d6a7;
+        }
+        
+        .answer-btn.wrong {
+            background: rgba(244, 67, 54, 0.2);
+            border-color: #f44336;
+            color: #ffabab;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: rgba(10, 20, 50, 0.85);
+            border-radius: 10px;
+            color: #a0c8ff;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        /* Asteroid Animation */
+        .asteroid {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle at 30% 30%, #8d6e63, #5d4037);
+            border-radius: 50%;
+            box-shadow: inset -5px -5px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .comet {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #b3e5fc, #4fc3f7);
+            border-radius: 50%;
+            box-shadow: 0 0 15px #4fc3f7;
+        }
+        
+        .star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 5px white;
+        }
+        
+        .ship {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #4fc3f7;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .planet-list {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .game-stats {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .planet-list {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .controls {
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                flex: 1;
+                min-width: 140px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .planet-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stat-box {
+                min-width: 90px;
+                padding: 8px 12px;
+            }
+            
+            .logo h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-infinity"></i>
+                <h1>Galaxy Infinity</h1>
+            </div>
+            <div class="game-stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="score">0</div>
+                    <div class="stat-label">Skor</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="level">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="lives">3</div>
+                    <div class="stat-label">Nyawa</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="asteroids">0</div>
+                    <div class="stat-label">Asteroid</div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <section class="dashboard">
+                <h2><i class="fas fa-gamepad"></i> Area Permainan</h2>
+                <div class="game-area">
+                    <canvas id="game-canvas"></canvas>
+                    <div id="game-objects"></div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn btn-primary" id="start-btn">
+                        <i class="fas fa-play"></i> Mulai Game
+                    </button>
+                    <button class="btn btn-secondary" id="pause-btn">
+                        <i class="fas fa-pause"></i> Jeda
+                    </button>
+                    <button class="btn btn-warning" id="reset-btn">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                    <button class="btn btn-success" id="info-btn">
+                        <i class="fas fa-info-circle"></i> Petunjuk
+                    </button>
+                </div>
+            </section>
+            
+            <section class="base">
+                <h2><i class="fas fa-satellite"></i> Stasiun Pengetahuan</h2>
+                
+                <div class="planet-info">
+                    <h3><i class="fas fa-globe-americas"></i> <span id="planet-title">Matahari</span></h3>
+                    <p id="planet-desc">Matahari adalah bintang di pusat tata surya kita. Diameternya sekitar 1,4 juta km, mengandung 99,86% massa total tata surya. Suhu intinya mencapai 15 juta derajat Celsius!</p>
+                </div>
+                
+                <h3><i class="fas fa-planet-ringed"></i> Planet Tata Surya</h3>
+                <div class="planet-list">
+                    <div class="planet-item active" data-planet="sun">
+                        <div class="planet-icon">☀️</div>
+                        <div class="planet-name">Matahari</div>
+                    </div>
+                    <div class="planet-item" data-planet="mercury">
+                        <div class="planet-icon">🪐</div>
+                        <div class="planet-name">Merkurius</div>
+                    </div>
+                    <div class="planet-item" data-planet="venus">
+                        <div class="planet-icon">⭐</div>
+                        <div class="planet-name">Venus</div>
+                    </div>
+                    <div class="planet-item" data-planet="earth">
+                        <div class="planet-icon">🌍</div>
+                        <div class="planet-name">Bumi</div>
+                    </div>
+                    <div class="planet-item" data-planet="mars">
+                        <div class="planet-icon">🔴</div>
+                        <div class="planet-name">Mars</div>
+                    </div>
+                    <div class="planet-item" data-planet="jupiter">
+                        <div class="planet-icon">🪐</div>
+                        <div class="planet-name">Jupiter</div>
+                    </div>
+                    <div class="planet-item" data-planet="saturn">
+                        <div class="planet-icon">🪐</div>
+                        <div class="planet-name">Saturnus</div>
+                    </div>
+                    <div class="planet-item" data-planet="asteroid">
+                        <div class="planet-icon">🪨</div>
+                        <div class="planet-name">Sabuk Asteroid</div>
+                    </div>
+                    <div class="planet-item" data-planet="comet">
+                        <div class="planet-icon">☄️</div>
+                        <div class="planet-name">Komet</div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" id="next-question-btn">
+                    <i class="fas fa-question-circle"></i> Pertanyaan Baru
+                </button>
+            </section>
+        </div>
+        
+        <div class="knowledge-section">
+            <section class="question-box">
+                <h3><i class="fas fa-question"></i> Pertanyaan Galaksi</h3>
+                <p class="question-text" id="question-text">Apa yang dimaksud dengan sabuk asteroid dan di mana letaknya dalam tata surya kita?</p>
+                
+                <div class="answer-buttons">
+                    <button class="answer-btn" data-answer="1">Kumpulan planet kecil antara Mars dan Jupiter</button>
+                    <button class="answer-btn" data-answer="2">Lingkaran es di sekitar Neptunus</button>
+                    <button class="answer-btn" data-answer="3">Gugusan bintang di galaksi kita</button>
+                    <button class="answer-btn" data-answer="4">Jalur komet mengelilingi Matahari</button>
+                </div>
+                
+                <div style="margin-top: 15px; display: none;" id="answer-feedback">
+                    <p><strong>Jawaban Benar:</strong> <span id="correct-answer">Sabuk asteroid adalah kumpulan batuan luar angkasa yang terletak antara orbit Mars dan Jupiter.</span></p>
+                </div>
+            </section>
+            
+            <section class="info-box">
+                <h3><i class="fas fa-lightbulb"></i> Fakta Luar Angkasa</h3>
+                <p class="info-text" id="info-text">Komet adalah benda langit yang mengelilingi Matahari dengan orbit berbentuk elips. Ketika mendekati Matahari, komet memanas dan melepaskan gas serta debu yang membentuk ekor yang panjang dan bercahaya. Ekor komet selalu menjauhi Matahari karena tekanan angin matahari.</p>
+                
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-secondary" id="new-fact-btn">
+                        <i class="fas fa-sync-alt"></i> Fakta Baru
+                    </button>
+                </div>
+            </section>
+        </div>
+        
+        <footer>
+            <p>Galaxy Infinity - Game Edukasi Tata Surya & Asteroid | &copy; 2023 Semua hak dilindungi</p>
+            <p>Gunakan tombol panah pada keyboard untuk menggerakkan pesawat ruang angkasa dan hindari asteroid!</p>
+        </footer>
+    </div>
+
+    <script>
+        // Game State
+        const gameState = {
+            score: 0,
+            level: 1,
+            lives: 3,
+            asteroids: 0,
+            gameRunning: false,
+            gamePaused: false,
+            shipX: 400,
+            shipY: 300,
+            keys: {}
+        };
+
+        // Planet Data
+        const planets = {
+            sun: {
+                title: "Matahari",
+                description: "Matahari adalah bintang di pusat tata surya kita. Diameternya sekitar 1,4 juta km, mengandung 99,86% massa total tata surya. Suhu intinya mencapai 15 juta derajat Celsius! Matahari adalah sumber energi utama bagi kehidupan di Bumi."
+            },
+            mercury: {
+                title: "Merkurius",
+                description: "Merkurius adalah planet terkecil dan terdekat dengan Matahari. Suhu permukaannya sangat ekstrem, dari 430°C di siang hari hingga -180°C di malam hari. Merkurius tidak memiliki satelit alami dan atmosfer yang signifikan."
+            },
+            venus: {
+                title: "Venus",
+                description: "Venus adalah planet terpanas di tata surya dengan suhu permukaan sekitar 465°C karena efek rumah kaca yang ekstrem. Venus berotasi sangat lambat dan arah rotasinya berlawanan dengan planet lain. Planet ini sering disebut 'bintang kejora' karena sangat terang di langit."
+            },
+            earth: {
+                title: "Bumi",
+                description: "Bumi adalah planet ketiga dari Matahari dan satu-satunya planet yang diketahui memiliki kehidupan. 71% permukaannya ditutupi air. Bumi memiliki satu satelit alami, Bulan, yang mempengaruhi pasang surut air laut. Atmosfernya kaya nitrogen dan oksigen."
+            },
+            mars: {
+                title: "Mars",
+                description: "Mars dikenal sebagai 'planet merah' karena kandungan besi oksida di permukaannya. Memiliki gunung tertinggi di tata surya, Olympus Mons, dan ngarai terbesar, Valles Marineris. Mars memiliki dua bulan kecil, Phobos dan Deimos."
+            },
+            jupiter: {
+                title: "Jupiter",
+                description: "Jupiter adalah planet terbesar di tata surya, massanya 2,5 kali gabungan semua planet lain. Memiliki 79 satelit yang diketahui dan sistem cincin yang samar. Bintik Merah Raksasa adalah badai raksasa yang telah berlangsung setidaknya 400 tahun."
+            },
+            saturn: {
+                title: "Saturnus",
+                description: "Saturnus terkenal dengan sistem cincinnya yang luas dan mencolok, terdiri dari partikel es dan batuan. Planet ini memiliki kepadatan terendah di antara semua planet - bahkan lebih rendah dari air! Saturnus memiliki 82 satelit yang dikonfirmasi, termasuk Titan yang memiliki atmosfer tebal."
+            },
+            asteroid: {
+                title: "Sabuk Asteroid",
+                description: "Sabuk asteroid terletak antara orbit Mars dan Jupiter, terdiri dari jutaan benda batuan dan logam dengan berbagai ukuran. Asteroid terbesar adalah Ceres, yang juga diklasifikasikan sebagai planet kerdil. Sabuk asteroid terbentuk dari sisa-sisa tata surya awal yang tidak pernah membentuk planet."
+            },
+            comet: {
+                title: "Komet",
+                description: "Komet adalah benda langit yang terdiri dari es, debu, dan batuan. Ketika mendekati Matahari, es menguap membentuk koma (atmosfer sementara) dan ekor yang panjang. Komet terkenal seperti Halley muncul setiap 76 tahun. Ekor komet selalu menjauhi Matahari karena tekanan angin matahari."
+            }
+        };
+
+        // Questions Database
+        const questions = [
+            {
+                question: "Apa yang dimaksud dengan sabuk asteroid dan di mana letaknya dalam tata surya kita?",
+                answers: [
+                    "Kumpulan planet kecil antara Mars dan Jupiter",
+                    "Lingkaran es di sekitar Neptunus",
+                    "Gugusan bintang di galaksi kita",
+                    "Jalur komet mengelilingi Matahari"
+                ],
+                correct: 1,
+                explanation: "Sabuk asteroid adalah kumpulan batuan luar angkasa yang terletak antara orbit Mars dan Jupiter."
+            },
+            {
+                question: "Planet mana yang memiliki cincin paling terlihat dan spektakuler?",
+                answers: [
+                    "Jupiter",
+                    "Saturnus",
+                    "Uranus",
+                    "Neptunus"
+                ],
+                correct: 2,
+                explanation: "Saturnus memiliki sistem cincin yang paling terlihat dan spektakuler di tata surya kita."
+            },
+            {
+                question: "Apa penyebab utama planet Venus menjadi planet terpanas di tata surya?",
+                answers: [
+                    "Paling dekat dengan Matahari",
+                    "Tidak memiliki atmosfer",
+                    "Efek rumah kaca yang ekstrem",
+                    "Aktivitas vulkanik yang tinggi"
+                ],
+                correct: 3,
+                explanation: "Venus memiliki efek rumah kaca yang ekstrem, menjebak panas dan membuat suhu permukaannya mencapai 465°C."
+            },
+            {
+                question: "Komet sering disebut sebagai 'bintang berekor'. Apa yang membentuk ekor komet?",
+                answers: [
+                    "Debu dan gas yang terionisasi",
+                    "Awan meteor",
+                    "Sisa pembakaran batu",
+                    "Cahaya Matahari yang dipantulkan"
+                ],
+                correct: 1,
+                explanation: "Ekor komet terbentuk dari debu dan gas yang terionisasi yang terlepas ketika komet mendekati Matahari."
+            },
+            {
+                question: "Berapa banyak satelit alami yang dimiliki planet Mars?",
+                answers: [
+                    "Tidak ada",
+                    "1",
+                    "2",
+                    "4"
+                ],
+                correct: 3,
+                explanation: "Mars memiliki dua bulan kecil bernama Phobos dan Deimos yang berbentuk tidak beraturan seperti kentang."
+            },
+            {
+                question: "Planet kerdil Ceres terletak di mana?",
+                answers: [
+                    "Sabuk Kuiper",
+                    "Awan Oort",
+                    "Sabuk Asteroid",
+                    "Orbit Neptunus"
+                ],
+                correct: 3,
+                explanation: "Ceres, planet kerdil terkecil, terletak di sabuk asteroid antara Mars dan Jupiter."
+            },
+            {
+                question: "Apa nama badai raksasa yang telah berlangsung selama berabad-abad di Jupiter?",
+                answers: [
+                    "Bintik Hitam Besar",
+                    "Bintik Merah Raksasa",
+                    "Badai Abadi",
+                    "Topan Jupiter"
+                ],
+                correct: 2,
+                explanation: "Bintik Merah Raksasa adalah badai antisiklon yang telah berlangsung setidaknya 400 tahun di Jupiter."
+            },
+            {
+                question: "Apa perbedaan utama antara asteroid dan komet?",
+                answers: [
+                    "Asteroid lebih besar dari komet",
+                    "Asteroid terbuat dari batuan dan logam, komet dari es dan debu",
+                    "Asteroid memiliki ekor, komet tidak",
+                    "Komet hanya ada di tata surya bagian dalam"
+                ],
+                correct: 2,
+                explanation: "Asteroid terutama terdiri dari batuan dan logam, sedangkan komet terdiri dari es, debu, dan bahan organik."
+            }
+        ];
+
+        // Space Facts Database
+        const spaceFacts = [
+            "Matahari mengandung 99,86% dari total massa tata surya kita.",
+            "Satu hari di Venus lebih lama dari satu tahun di Venus. Venus membutuhkan 243 hari Bumi untuk berotasi sekali, tetapi hanya 225 hari Bumi untuk mengelilingi Matahari.",
+            "Jupiter memiliki 79 bulan yang diketahui, lebih banyak dari planet lain di tata surya.",
+            "Sabuk asteroid antara Mars dan Jupiter mengandung jutaan asteroid, tetapi jarak antara mereka sangat besar - rata-rata jutaan kilometer.",
+            "Komet Halley akan terlihat lagi dari Bumi pada tahun 2061. Komet ini muncul setiap 76 tahun.",
+            "Mars memiliki gunung tertinggi di tata surya, Olympus Mons, dengan tinggi sekitar 22 km - hampir tiga kali lebih tinggi dari Gunung Everest.",
+            "Saturnus adalah satu-satunya planet di tata surya kita yang memiliki kepadatan rata-rata lebih rendah dari air. Ini berarti Saturnus akan mengapung jika ada kolam air yang cukup besar!",
+            "Merkurius adalah satu-satunya planet di tata surya kita yang tidak memiliki satelit alami atau bulan.",
+            "Ekor komet selalu menjauhi Matahari karena tekanan angin matahari, terlepas dari arah pergerakan komet itu sendiri.",
+            "Bumi adalah satu-satunya planet di tata surya yang tidak dinamai dari dewa mitologi Romawi atau Yunani."
+        ];
+
+        // DOM Elements
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const livesElement = document.getElementById('lives');
+        const asteroidsElement = document.getElementById('asteroids');
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const infoBtn = document.getElementById('info-btn');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const newFactBtn = document.getElementById('new-fact-btn');
+        const planetItems = document.querySelectorAll('.planet-item');
+        const planetTitle = document.getElementById('planet-title');
+        const planetDesc = document.getElementById('planet-desc');
+        const questionText = document.getElementById('question-text');
+        const answerButtons = document.querySelectorAll('.answer-btn');
+        const answerFeedback = document.getElementById('answer-feedback');
+        const correctAnswerText = document.getElementById('correct-answer');
+        const infoText = document.getElementById('info-text');
+        const gameCanvas = document.getElementById('game-canvas');
+        const gameObjects = document.getElementById('game-objects');
+
+        // Initialize Canvas
+        const ctx = gameCanvas.getContext('2d');
+        gameCanvas.width = gameCanvas.parentElement.clientWidth;
+        gameCanvas.height = 400;
+
+        // Game Objects
+        let asteroids = [];
+        let stars = [];
+        let comets = [];
+
+        // Initialize Game
+        function initGame() {
+            // Create stars background
+            stars = [];
+            for (let i = 0; i < 100; i++) {
+                stars.push({
+                    x: Math.random() * gameCanvas.width,
+                    y: Math.random() * gameCanvas.height,
+                    size: Math.random() * 2 + 1,
+                    speed: Math.random() * 0.5 + 0.2
+                });
+            }
+            
+            // Create initial comets
+            comets = [];
+            for (let i = 0; i < 3; i++) {
+                createComet();
+            }
+            
+            // Set initial planet
+            updatePlanetInfo('sun');
+            
+            // Set initial question
+            showRandomQuestion();
+            
+            // Set initial fact
+            showRandomFact();
+            
+            // Update UI
+            updateUI();
+            
+            // Start game loop
+            gameLoop();
+        }
+
+        // Create a comet
+        function createComet() {
+            comets.push({
+                x: Math.random() * gameCanvas.width,
+                y: Math.random() * gameCanvas.height,
+                size: Math.random() * 15 + 10,
+                speedX: (Math.random() - 0.5) * 3,
+                speedY: (Math.random() - 0.5) * 3,
+                trail: []
+            });
+        }
+
+        // Create an asteroid
+        function createAsteroid() {
+            const size = Math.random() * 30 + 20;
+            asteroids.push({
+                x: Math.random() > 0.5 ? -size : gameCanvas.width + size,
+                y: Math.random() * gameCanvas.height,
+                size: size,
+                speedX: (Math.random() - 0.5) * 4,
+                speedY: (Math.random() - 0.5) * 4,
+                rotation: 0,
+                rotationSpeed: (Math.random() - 0.5) * 0.05
+            });
+            gameState.asteroids++;
+            asteroidsElement.textContent = gameState.asteroids;
+        }
+
+        // Update planet info
+        function updatePlanetInfo(planetId) {
+            const planet = planets[planetId];
+            planetTitle.textContent = planet.title;
+            planetDesc.textContent = planet.description;
+            
+            // Update active planet item
+            planetItems.forEach(item => {
+                if (item.dataset.planet === planetId) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // Show random question
+        function showRandomQuestion() {
+            const randomIndex = Math.floor(Math.random() * questions.length);
+            const question = questions[randomIndex];
+            
+            questionText.textContent = question.question;
+            
+            answerButtons.forEach((btn, index) => {
+                btn.textContent = question.answers[index];
+                btn.classList.remove('correct', 'wrong');
+            });
+            
+            answerFeedback.style.display = 'none';
+            
+            // Store current question data
+            questionText.dataset.questionIndex = randomIndex;
+        }
+
+        // Show random fact
+        function showRandomFact() {
+            const randomIndex = Math.floor(Math.random() * spaceFacts.length);
+            infoText.textContent = spaceFacts[randomIndex];
+        }
+
+        // Check answer
+        function checkAnswer(selectedAnswer) {
+            const questionIndex = parseInt(questionText.dataset.questionIndex);
+            const question = questions[questionIndex];
+            const correctAnswer = question.correct;
+            
+            answerButtons.forEach((btn, index) => {
+                if (index + 1 === correctAnswer) {
+                    btn.classList.add('correct');
+                } else if (index + 1 === parseInt(selectedAnswer)) {
+                    btn.classList.add('wrong');
+                }
+            });
+            
+            correctAnswerText.textContent = question.explanation;
+            answerFeedback.style.display = 'block';
+            
+            // Update score if correct
+            if (parseInt(selectedAnswer) === correctAnswer) {
+                gameState.score += 100;
+                scoreElement.textContent = gameState.score;
+            }
+        }
+
+        // Update UI
+        function updateUI() {
+            scoreElement.textContent = gameState.score;
+            levelElement.textContent = gameState.level;
+            livesElement.textContent = gameState.lives;
+            asteroidsElement.textContent = gameState.asteroids;
+        }
+
+        // Draw ship
+        function drawShip() {
+            ctx.save();
+            ctx.translate(gameState.shipX, gameState.shipY);
+            
+            // Draw ship body
+            ctx.fillStyle = '#4fc3f7';
+            ctx.beginPath();
+            ctx.moveTo(0, -15);
+            ctx.lineTo(-10, 10);
+            ctx.lineTo(0, 5);
+            ctx.lineTo(10, 10);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw ship details
+            ctx.fillStyle = '#2196f3';
+            ctx.fillRect(-3, -5, 6, 10);
+            
+            ctx.restore();
+        }
+
+        // Draw asteroids
+        function drawAsteroids() {
+            asteroids.forEach(asteroid => {
+                ctx.save();
+                ctx.translate(asteroid.x, asteroid.y);
+                ctx.rotate(asteroid.rotation);
+                
+                // Draw asteroid
+                ctx.fillStyle = '#8d6e63';
+                ctx.beginPath();
+                ctx.arc(0, 0, asteroid.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Asteroid details
+                ctx.fillStyle = '#5d4037';
+                ctx.beginPath();
+                ctx.arc(asteroid.size * 0.3, -asteroid.size * 0.2, asteroid.size * 0.2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(-asteroid.size * 0.2, asteroid.size * 0.3, asteroid.size * 0.15, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+                
+                // Update asteroid position
+                asteroid.x += asteroid.speedX;
+                asteroid.y += asteroid.speedY;
+                asteroid.rotation += asteroid.rotationSpeed;
+                
+                // Wrap around screen
+                if (asteroid.x < -asteroid.size) asteroid.x = gameCanvas.width + asteroid.size;
+                if (asteroid.x > gameCanvas.width + asteroid.size) asteroid.x = -asteroid.size;
+                if (asteroid.y < -asteroid.size) asteroid.y = gameCanvas.height + asteroid.size;
+                if (asteroid.y > gameCanvas.height + asteroid.size) asteroid.y = -asteroid.size;
+                
+                // Check collision with ship
+                const distance = Math.sqrt(
+                    Math.pow(asteroid.x - gameState.shipX, 2) + 
+                    Math.pow(asteroid.y - gameState.shipY, 2)
+                );
+                
+                if (distance < asteroid.size + 15 && gameState.gameRunning) {
+                    // Collision detected
+                    gameState.lives--;
+                    livesElement.textContent = gameState.lives;
+                    
+                    // Remove asteroid
+                    const index = asteroids.indexOf(asteroid);
+                    if (index > -1) {
+                        asteroids.splice(index, 1);
+                    }
+                    
+                    // Game over check
+                    if (gameState.lives <= 0) {
+                        gameState.gameRunning = false;
+                        alert(`Game Over! Skor akhir Anda: ${gameState.score}`);
+                    }
+                }
+            });
+        }
+
+        // Draw stars
+        function drawStars() {
+            stars.forEach(star => {
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Twinkle effect
+                if (Math.random() > 0.95) {
+                    star.size = Math.random() * 2 + 1;
+                }
+                
+                // Move stars slightly
+                star.y += star.speed;
+                if (star.y > gameCanvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * gameCanvas.width;
+                }
+            });
+        }
+
+        // Draw comets
+        function drawComets() {
+            comets.forEach(comet => {
+                // Draw comet trail
+                ctx.strokeStyle = 'rgba(79, 195, 247, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(comet.x, comet.y);
+                
+                comet.trail.forEach((point, index) => {
+                    ctx.lineTo(point.x, point.y);
+                });
+                ctx.stroke();
+                
+                // Draw comet
+                ctx.fillStyle = '#4fc3f7';
+                ctx.beginPath();
+                ctx.arc(comet.x, comet.y, comet.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Add current position to trail
+                comet.trail.unshift({x: comet.x, y: comet.y});
+                if (comet.trail.length > 20) {
+                    comet.trail.pop();
+                }
+                
+                // Update comet position
+                comet.x += comet.speedX;
+                comet.y += comet.speedY;
+                
+                // Wrap around screen
+                if (comet.x < -comet.size) comet.x = gameCanvas.width + comet.size;
+                if (comet.x > gameCanvas.width + comet.size) comet.x = -comet.size;
+                if (comet.y < -comet.size) comet.y = gameCanvas.height + comet.size;
+                if (comet.y > gameCanvas.height + comet.size) comet.y = -comet.size;
+                
+                // Occasionally change direction
+                if (Math.random() > 0.995) {
+                    comet.speedX = (Math.random() - 0.5) * 3;
+                    comet.speedY = (Math.random() - 0.5) * 3;
+                }
+            });
+        }
+
+        // Game loop
+        function gameLoop() {
+            // Clear canvas
+            ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+            
+            // Draw background
+            ctx.fillStyle = 'rgba(5, 10, 30, 0.3)';
+            ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+            
+            // Draw game objects
+            drawStars();
+            drawComets();
+            drawAsteroids();
+            
+            if (gameState.gameRunning) {
+                drawShip();
+                
+                // Move ship based on keys
+                if (gameState.keys['ArrowUp'] && gameState.shipY > 15) {
+                    gameState.shipY -= 5;
+                }
+                if (gameState.keys['ArrowDown'] && gameState.shipY < gameCanvas.height - 15) {
+                    gameState.shipY += 5;
+                }
+                if (gameState.keys['ArrowLeft'] && gameState.shipX > 15) {
+                    gameState.shipX -= 5;
+                }
+                if (gameState.keys['ArrowRight'] && gameState.shipX < gameCanvas.width - 15) {
+                    gameState.shipX += 5;
+                }
+                
+                // Occasionally create new asteroids
+                if (Math.random() > 0.98) {
+                    createAsteroid();
+                }
+                
+                // Occasionally create new comets
+                if (Math.random() > 0.995 && comets.length < 5) {
+                    createComet();
+                }
+                
+                // Level up based on score
+                const newLevel = Math.floor(gameState.score / 500) + 1;
+                if (newLevel > gameState.level) {
+                    gameState.level = newLevel;
+                    levelElement.textContent = gameState.level;
+                    alert(`Level up! Sekarang level ${gameState.level}`);
+                }
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Event Listeners
+        startBtn.addEventListener('click', () => {
+            gameState.gameRunning = true;
+            gameState.gamePaused = false;
+            startBtn.innerHTML = '<i class="fas fa-play"></i> Game Berjalan';
+            startBtn.classList.remove('btn-primary');
+            startBtn.classList.add('btn-success');
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            gameState.gamePaused = !gameState.gamePaused;
+            gameState.gameRunning = !gameState.gamePaused;
+            
+            if (gameState.gamePaused) {
+                pauseBtn.innerHTML = '<i class="fas fa-play"></i> Lanjutkan';
+                pauseBtn.classList.remove('btn-secondary');
+                pauseBtn.classList.add('btn-warning');
+            } else {
+                pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Jeda';
+                pauseBtn.classList.remove('btn-warning');
+                pauseBtn.classList.add('btn-secondary');
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            if (confirm("Apakah Anda yakin ingin mereset game? Semua progress akan hilang.")) {
+                gameState.score = 0;
+                gameState.level = 1;
+                gameState.lives = 3;
+                gameState.asteroids = 0;
+                gameState.gameRunning = false;
+                gameState.gamePaused = false;
+                gameState.shipX = gameCanvas.width / 2;
+                gameState.shipY = gameCanvas.height / 2;
+                
+                asteroids = [];
+                startBtn.innerHTML = '<i class="fas fa-play"></i> Mulai Game';
+                startBtn.classList.remove('btn-success');
+                startBtn.classList.add('btn-primary');
+                
+                pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Jeda';
+                pauseBtn.classList.remove('btn-warning');
+                pauseBtn.classList.add('btn-secondary');
+                
+                updateUI();
+            }
+        });
+
+        infoBtn.addEventListener('click', () => {
+            alert("Kontrol Game:\n- Gunakan tombol panah untuk menggerakkan pesawat\n- Hindari asteroid yang mendekat\n- Kumpulkan poin dengan menjawab pertanyaan dengan benar\n- Setiap 500 poin, level akan naik\n\nKlik 'Mulai Game' untuk memulai!");
+        });
+
+        nextQuestionBtn.addEventListener('click', showRandomQuestion);
+
+        newFactBtn.addEventListener('click', showRandomFact);
+
+        // Planet item click events
+        planetItems.forEach(item => {
+            item.addEventListener('click', () => {
+                updatePlanetInfo(item.dataset.planet);
+            });
+        });
+
+        // Answer button click events
+        answerButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (answerFeedback.style.display === 'block') return;
+                checkAnswer(btn.dataset.answer);
+            });
+        });
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                gameState.keys[e.key] = true;
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                gameState.keys[e.key] = false;
+                e.preventDefault();
+            }
+        });
+
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            gameCanvas.width = gameCanvas.parentElement.clientWidth;
+        });
+
+        // Initialize the game
+        initGame();
+    </script>
+</body>
+</html>
